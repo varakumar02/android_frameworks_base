@@ -311,7 +311,10 @@ constructor(
 
     override val isWifiEnabled: StateFlow<Boolean> =
         wifiPickerTrackerInfo
-            .map { it.state == WifiManager.WIFI_STATE_ENABLED }
+            .map {
+                it.state == WifiManager.WIFI_STATE_ENABLED ||
+                    it.state == WifiManager.WIFI_STATE_ENABLING
+            }
             .distinctUntilChanged()
             .logDiffsForTable(tableLogger, columnName = COL_NAME_IS_ENABLED, initialValue = false)
             .stateIn(scope, SharingStarted.Eagerly, false)
@@ -490,6 +493,8 @@ constructor(
     }
 
     override fun disableWifi() {
+        cancelOptimisticToggleTimeoutJobs()
+        _wifiToggleState.value = WifiToggleState.Normal
         wifiManager.setWifiEnabled(false)
     }
 

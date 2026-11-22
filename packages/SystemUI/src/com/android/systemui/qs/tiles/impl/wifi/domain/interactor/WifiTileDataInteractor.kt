@@ -172,15 +172,17 @@ constructor(
                 )
             }
 
+            // The tap toggles on isEnabled, so the tile state has to follow it too: enabled but
+            // not (yet) the default network is Active, only fully off is Inactive.
+            if (isEnabled) {
+                return@combine WifiTileModel.Active(
+                    icon = WifiTileIconModel(WifiIcons.WIFI_NO_SIGNAL),
+                    secondaryLabel = notConnectedDescription,
+                )
+            }
+
             WifiTileModel.Inactive(
-                icon =
-                    WifiTileIconModel(
-                        if (isEnabled) {
-                            WifiIcons.WIFI_NO_SIGNAL
-                        } else {
-                            R.drawable.ic_signal_wifi_off
-                        }
-                    ),
+                icon = WifiTileIconModel(R.drawable.ic_signal_wifi_off),
                 secondaryLabel = notConnectedDescription,
             )
         }.onStart { dataUsageRepository.refresh() }
